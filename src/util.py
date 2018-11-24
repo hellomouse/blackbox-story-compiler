@@ -17,7 +17,8 @@ TAB_SPACE = 4
 
 
 def is_valid_java_variable(name):
-    return name[0].lower() in "abcdefghijklmnopqrstuvwxyz$_" and name not in JAVA_KEYWORDS
+    return len(name) > 0 and name.lower()[0] in "abcdefghijklmnopqrstuvwxyz$_" and \
+        all([char in "abcdefghijklmnopqrstuvwxyz$_1234567890" for char in name.lower()]) and name not in JAVA_KEYWORDS
 
 
 def indent_code(string, tabs):
@@ -38,7 +39,7 @@ def parse_goto(line):
 
     # Embed java code
     if line.split(" ")[0] == "CODE":
-        return line.split("CODE ")[1].split("<endcode>")[0].replace("\n", "")
+        return line.split("CODE ")[1].split("<endcode>")[0]
 
     # Normal GOTO (GOTO id)
     return "conversation.gotoChatNode(\"" + line.replace("\n", "") + "\");"

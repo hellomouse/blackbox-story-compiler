@@ -36,4 +36,7 @@ GOTO test
 DEFINE var id
     """
     p = parser.Parser(string)
-    print(p.generate_code())
+    # print(p.generate_code())
+
+    from src import choice
+    print(choice.Choice("test<command>blah</command>same line as before\nnewline GOTO id", "id").generate_code())

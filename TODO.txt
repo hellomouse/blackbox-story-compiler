@@ -8,3 +8,5 @@ Give error line numbers
 Properly implement end scene
 
 A #define like thing to replace choices or code
+
+python -m unittest discover <test_directory>
