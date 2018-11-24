@@ -13,7 +13,39 @@ JAVA_KEYWORDS = ["abstract",  "assert",       "boolean",    "break",      "byte"
                  "switch",    "synchronized", "this",       "throw",     "throws",
                  "transient", "true",         "try",        "void",      "volatile",
                  "while"]
+TAB_SPACE = 4
 
 
 def is_valid_java_variable(name):
     return name[0].lower() in "abcdefghijklmnopqrstuvwxyz$_" and name not in JAVA_KEYWORDS
+
+
+def indent_code(string, tabs):
+    return "\n".join([" " * (TAB_SPACE * tabs) + line for line in string.split("\n")])
+
+
+def camel_case(string):
+    return "".join([x.title() for x in string.split(" ")])
+
+
+def parse_goto(line):
+    line = line.split("GOTO ")[1]
+
+    # Randomization: RAND choice1 choice2...
+    if line.split(" ")[0] == "RAND":
+        return "String[] arr = {" + ", ".join(["\"{}\"".format(x.replace("\n", "")) for x in line.split(" ")[1:]]) + "};\n" + \
+               "conversation.gotoChatNode(Random.choice(arr));"
+
+    # Embed java code
+    if line.split(" ")[0] == "CODE":
+        return line.split("CODE ")[1].split("<endcode>")[0].replace("\n", "")
+
+    # Normal GOTO (GOTO id)
+    return "conversation.gotoChatNode(\"" + line.replace("\n", "") + "\");"
+
+
+def index(string, search):
+    try:
+        return string.index(search)
+    except ValueError:
+        return -1

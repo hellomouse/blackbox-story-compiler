@@ -1,0 +1,10 @@
+Check for duplicate chatnode ids
+
+Convert extra stuff to code like
+MODIFY_AI and stuff
+
+Give error line numbers
+
+Properly implement end scene
+
+A #define like thing to replace choices or code
