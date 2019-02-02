@@ -14,16 +14,21 @@ CHOICE_REGEX = re.compile(r"<choice>([\s\S]*?)</choice>", re.MULTILINE)
 TIMEOUT_REGEX = re.compile(r"<timeout>([\s\S]*?)</timeout>", re.MULTILINE)
 COMMAND_REGEX = re.compile(r"<command>([\s\S]*?)</command>", re.MULTILINE)
 
-TEMPLATE = """private class ChatNode{id} extends ChatNode {{
+TEMPLATE = """{choice_classes}
+
+class ChatNode{id} extends ChatNode {{
     public ChatNode{id}() {{
-        Array<Choice> choices = new Array<Choice>();{choice_classes}
-{choice_adding}
-        super(choices, "{text}", {timeout}, {timeout_choice});
+        super(generateChoices(), "{text}", {timeout}, {timeout_choice});
+    }}
+    
+    private static Array<Choice> generateChoices() {{
+        Array<Choice> choices = new Array<Choice>();
+        {choice_adding}
+        return choices;
     }}
     
     public void onLoad(Conversation conversation) {{
-        super.onLoad(conversation);
-{on_load_code}
+        super.onLoad(conversation);{on_load_code}
     }}
 }}"""
 
@@ -130,7 +135,7 @@ class ChatNode(object):
             text=self.text,
             timeout=self.timeout if self.timeout is not None else "-1",
             timeout_choice=tc,
-            on_load_code=self.command_choice
+            on_load_code="\n" + self.command_choice if self.command_choice != "" else ""
         ), 2)
 
 

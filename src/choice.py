@@ -11,7 +11,7 @@ from src import util
 LABEL_REGEX = re.compile(r"<label>([\s\S]*?)</label>", re.MULTILINE)
 COMMAND_REGEX = re.compile(r"<command>([\s\S]*?)</command>", re.MULTILINE)
 TEMPLATE = """
-private class Choice{id} extends Choice {{
+class Choice{id} extends Choice {{
     public Choice{id}() {{  super("{label}", "{display_text}"); }}
     public void onSelect(Conversation conversation) {{
 {command_text}{next_code}
@@ -22,7 +22,7 @@ class Choice(object):
     def __init__(self, data, id):
         self.label = None
         self.text = None
-        self.id = id
+        self.id = util.camel_case(id)
         self.command_text = None
         self.goto = None
 
@@ -70,7 +70,7 @@ class Choice(object):
 
     def generate_code(self):
         return util.indent_code(TEMPLATE.format(
-            id=util.camel_case(self.id),
+            id=self.id,
             label=self.label,
             display_text=self.text.lstrip().rstrip(),
             command_text=util.indent_code(self.command_text, 2) + "\n" if self.command_text is not None else "",

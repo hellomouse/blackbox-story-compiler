@@ -12,7 +12,7 @@ from src import chatnode
 
 stop_lines = [
     "SCENE", "SCENE_SUB", "SOUND", "MUSIC", "SCENE_BACKGROUND",
-    "DEFINE", "DEFINE_GLOBAL", "CHATNODE", "SCENE_START", "SCENE_END"
+    "DEFINE", "DEFINE_GLOBAL", "CHATNODE", "SCENE_START"
 ]
 CLASS_TEMPLATE = """
 package blackbox.game.conversation.story;
@@ -21,21 +21,32 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Array;
 
+import blackbox.game.conversation.Conversation;
 import blackbox.game.util.*;
+import blackbox.game.graphics.BlackBoxScreen;
 import blackbox.game.conversation.graph.*;
 
-public class {classname} extends Conversation {{
-    public {classname}(Screen level) {{
-        super(level, "{title}", "{subtitle}", "{background}");
-        {music_code}{sound_code}{variable_code}
-        /* Generate classes */
+/* Generate classes */
 {class_code}
 {add_chatnode_code}
+
+public class {classname} extends Conversation {{
+    public {classname}(BlackBoxScreen level) {{
+        super(level, "{title}", "{subtitle}", "{background}");
+        {music_code}{sound_code}{variable_code}
+
+        chatNodes = new ObjectMap<String, ChatNode>();
+{add_nodes}
     }}
 
     public void gotoStart() {{
 {go_to_start}
+    }}
+    
+    public void end() {{
+        super.end();
     }}
 }}
 """
@@ -64,13 +75,12 @@ class Parser(object):
         self.parse_chatnodes()
 
     """
-    parse)basic - Scans the string
+    parse_basic - Scans the string
     for basic metadata like conversation
     title, subtitle, etc...
     """
     def parse_basic(self):
         scene_start_found = False
-        scene_end_found = False
 
         for index, line in enumerate(self.lines):
             if line.startswith("SCENE "):
@@ -97,15 +107,11 @@ class Parser(object):
                     logger.log.warn("See line {}".format(index + 1))
                 scene_start_found = True
 
-                if "GOTO " not in line:
-                    raise NoStartException("START_SCENE expression on line {} is invalid: Missing GOTO".format(index + 1))
-
-                self.start = util.parse_goto(line.split("SCENE_START ")[1])
-            elif line.startswith("SCENE_END "):
-                if scene_end_found:
-                    logger.log.warn("A scene end has already been defined, overriding")
-                    logger.log.warn("See line {}".format(index + 1))
-                scene_end_found = True
+                try:
+                    self.start = util.parse_goto(line.replace("SCENE_START", "GOTO"))
+                except Exception as e:
+                    raise NoStartException(
+                        "START_SCENE expression on line {} is invalid: {}".format(index + 1, str(e)))
 
         if self.title is None:
             raise MissingArgumentException("Missing SCENE tag (No scene title)")
@@ -113,8 +119,6 @@ class Parser(object):
             raise MissingArgumentException("Missing SCENE_SUB tag (No scene subtitle)")
         if not scene_start_found:
             raise NoStartException("No SCENE_START found.")
-        if not scene_end_found:
-            raise NoEndException("No SCENE_END found.")
 
         self.class_name = util.camel_case(self.title)
 
@@ -135,11 +139,20 @@ class Parser(object):
         chatnodes = [x.lstrip("\n").rstrip("\n") for x in chatnodes if x.startswith("CHATNODE")]
         self.chatnodes = [chatnode.ChatNode(c.split("\n")) for c in chatnodes]
 
+        # Warn of duplicates
+        temp = set()
+        chatnodes = [x.id for x in self.chatnodes]
+        for node in chatnodes:
+            if node in temp:
+                logger.warn("Duplicate chat node ID {}".format(node))
+            else:
+                temp.add(node)
+
     """
     Convert code into a java class
     """
     def generate_code(self):
-        return CLASS_TEMPLATE.format(
+        r = CLASS_TEMPLATE.format(
             classname=self.class_name,
             title=self.title,
             subtitle=self.subtitle,
@@ -149,8 +162,12 @@ class Parser(object):
             variable_code=self.generate_variable_code(),
             class_code="\n".join([c.generate_code() for c in self.chatnodes]),
             add_chatnode_code="",
-            go_to_start=util.indent_code(self.start.replace("conversation.", "this."), 2)
+            go_to_start=util.indent_code(self.start.replace("conversation.", "this."), 2),
+            add_nodes=util.indent_code(
+                "\n".join(["chatNodes.put(\"{}\", new ChatNode{}());".format(x.id, util.camel_case(x.id)) \
+                           for x in self.chatnodes]), 2)
         )
+        return r
 
     """
     Generate the code in the constructor
@@ -197,10 +214,6 @@ class Parser(object):
 
 # Exceptions
 class NoStartException(Exception):
-    pass
-
-
-class NoEndException(Exception):
     pass
 
 

@@ -1,12 +1,13 @@
-Check for duplicate chatnode ids
-
-Convert extra stuff to code like
-MODIFY_AI and stuff
-
-Give error line numbers
-
-Properly implement end scene
-
-A #define like thing to replace choices or code
-
 python -m unittest discover <test_directory>
+
+    test chatnode
+    test parser
+
+
+Program version and shit
+cli app
+
+
+Enable / disable chat interface for java
+    add to java todo
+The text commands ie MODIY_AI_DATA also have java equivelant

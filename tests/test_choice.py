@@ -6,7 +6,7 @@ class TestChoice(unittest.TestCase):
     def test_simple_choice_code_otuput(self):
         inp = "Choice text here GOTO id"
         out = """        
-        private class ChoiceId extends Choice {
+        class ChoiceId extends Choice {
             public ChoiceId() {  super("Choice text here", "Choice text here"); }
             public void onSelect(Conversation conversation) {
                 conversation.gotoChatNode("id");
@@ -17,7 +17,7 @@ class TestChoice(unittest.TestCase):
     def test_choice_with_label_code_output(self):
         inp = "test\n<label>label text\nthis should be 1 line</label>\nGOTO RAND a b"
         out = """        
-        private class ChoiceId extends Choice {
+        class ChoiceId extends Choice {
             public ChoiceId() {  super("label text this should be 1 line", "test"); }
             public void onSelect(Conversation conversation) {
                 String[] arr = {"a", "b"};
@@ -30,7 +30,7 @@ class TestChoice(unittest.TestCase):
     def test_choice_with_command_code_output(self):
         inp = "test\n<command>line 1\nnew line 2</command>\nGOTO RAND a b"
         out = """        
-        private class ChoiceId extends Choice {
+        class ChoiceId extends Choice {
             public ChoiceId() {  super("test", "test"); }
             public void onSelect(Conversation conversation) {
                 line 1
@@ -56,7 +56,7 @@ class TestChoice(unittest.TestCase):
     def test_choice_with_tags_seperating_body_text(self):
         inp = "test <command>blah</command>same line as before\nnewline GOTO id"
         out = """        
-        private class ChoiceId extends Choice {
+        class ChoiceId extends Choice {
             public ChoiceId() {  super("test same line as before newline", "test same line as before\\nnewline"); }
             public void onSelect(Conversation conversation) {
                 blah
