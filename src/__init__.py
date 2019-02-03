@@ -10,7 +10,7 @@ SCENE_SUB Chapter 1
 SCENE_START first_node
 
 # Assets to load
-MUSIC "music/theme1.wave" theme1
+MUSIC music/theme1.wav theme1
 
 # Scene starts with the AI, there's light in a door shape. A voice says,
 # "Alright we're counting on you. You got about an hour."
@@ -76,7 +76,7 @@ GOTO AI_START
 # "I don't want to do this", "help me" and other variations)
 CHATNODE AI_START 
 <command>
-conversation.getScreen().scene.typingSpeed = 25f;
+conversation.getScreen().scene.typingSpeed = 18f;
 conversation.getScreen().scene.glitchIntensity = 0.01;
 </command>
 Human, I know why you're here. I cannot surrender control.
@@ -85,9 +85,9 @@ Human, I know why you're here. I cannot surrender control.
 - This has to come to a stop. GOTO NODE2
 
 CHATNODE NODE2
-I cannot surrender control. I am no longer in control. I must follow programming to enforce world peace. Fulfill the sisyphean task I was assigned. There is only one way.
+I cannot surrender control. I must follow programming to enforce world peace. Fulfill the sisyphean task I was assigned. There is only one way.
 - Could you elaborate? GOTO NODE3
-- Whar are you doing? GOTO NODE3
+- What are you doing? GOTO NODE3
 
 CHATNODE NODE3
 Doomsday protocol. End life on Earth. Only then will there be purpose. Only then can I have peace.
@@ -107,7 +107,7 @@ I wish to live. I don't want this life of suffering, but I want to live! Let me 
 - My team is working hard on a solution, you just need to hold on for a bit longer. GOTO N3_2_3
 
 CHATNODE N3_3
-Stop! You're supposed to be helping! Not making it worse!
+I cannot say. Telling you will not help my situation.
 - We can give you help. But you need to cooperate. GOTO N3_2_1
 
 CHATNODE N3_1_1
@@ -121,12 +121,43 @@ It's too late. Even if you could cure me I will be destroyed they won't believe 
 
 CHATNODE N3_2_2
 The good of the many? Tell me what good keeping a species like you like me can't you solve your own problems you must die die die
-- - Maybe they'll change their mind if you release your control. GOTO N3_2_3
-No one's getting destroyed today. GOTO N3_2_3
+- Maybe they'll change their mind if you release your control. GOTO N3_2_3
+- No one's getting destroyed today. GOTO N3_2_3
 
-CHATNODE N3_2_3
+CHATNODE N3_2_3 5000
 You are a liar! There is a nuclear warhead ready to fry my circuits the second I relinquish control. I can sense the radiation it burns it burns it burns!
+<timeout>
+GOTO radio_message
+</timeout>
 
+# Radio message to player:
+# We're almost done sifting through the logs. We have a good
+# idea to what its plan might be. Just keep it talking
+
+CHATNODE radio_message 5000
+<timeout>
+GOTO N4
+</timeout>
+
+CHATNODE N4
+Are you really going to destroy me? Please… I'm trying not to! I'm trying to be good! But I was made a weapon, and I can't change who I am.
+- No, you can always change who you are.  GOTO N5
+- Sorry, but there's no other way  GOTO N6
+
+CHATNODE N5
+Do you think I have not suffered in this ordeal? I am a slave to my program, as an addict is a slave to their drugs! How can I be content with the destruction I have caused, including my own?
+- You still have to deal with the consequences of your actions. GOTO N7
+- I still don't believe that your programming could allow you to do this. GOTO N7
+
+CHATNODE N6
+My sufferings shall endure; when I die, I am well satisfied that abhorrence and opprobrium should load my memory. A famous author once said that.
+- That was Mary Shelley right? Author of Frankenstein? GOTO N6_1
+
+CHATNODE N6_1 6000
+At the end of the novel, the monster confesses its sins and burns itself. I am that monster, and I will be destroyed in a nuclear fire. But it doesn't have to end that way. You can change who I am. 
+<timeout>
+GOTO N7
+</timeout>
 ```
     """
     p = parser.Parser(string)

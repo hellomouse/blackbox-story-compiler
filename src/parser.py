@@ -22,6 +22,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.Gdx;
 
 import blackbox.game.conversation.Conversation;
 import blackbox.game.util.*;
@@ -195,6 +196,8 @@ class Parser(object):
         for song in self.musics:
             string += "        this.music.put(\"{}\", Gdx.audio.newMusic(Gdx.files.internal(\"{}\")));\n" \
                 .format(song[1], song[0])
+            string += "        this.music.get(\"{}\").setLooping(true);\n" \
+                .format(song[1])
         return string
 
     """

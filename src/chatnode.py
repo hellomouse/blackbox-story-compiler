@@ -9,6 +9,7 @@ import re
 from src import logger
 from src import choice
 from src import util
+import uuid
 
 CHOICE_REGEX = re.compile(r"<choice>([\s\S]*?)</choice>", re.MULTILINE)
 TIMEOUT_REGEX = re.compile(r"<timeout>([\s\S]*?)</timeout>", re.MULTILINE)
@@ -53,6 +54,7 @@ class ChatNode(object):
         self.timeout_choice = None
         self.choices = []
         self.text = None
+        self.uuid = uuid.uuid4().hex
 
         self.parse(data)
         self.parse_text(data)
@@ -75,7 +77,7 @@ class ChatNode(object):
         if header_info[0] != "CHATNODE" or len(header_info) < 2:
             raise InvalidChatNode("Chat node with header {} contains invalid CHATNODE header".format(data[0]))
 
-        self.id = header_info[1]
+        self.id = header_info[1] + self.uuid
         self.timeout = -1 if len(header_info) <= 2 else header_info[2]
 
         try:
