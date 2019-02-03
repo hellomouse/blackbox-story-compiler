@@ -192,7 +192,7 @@ class Parser(object):
             return ""
 
         string = "\n        /* Pre-load music */\n"
-        for song in self.sounds:
+        for song in self.musics:
             string += "        this.music.put(\"{}\", Gdx.audio.newMusic(Gdx.files.internal(\"{}\")));\n" \
                 .format(song[1], song[0])
         return string
